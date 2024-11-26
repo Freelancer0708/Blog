@@ -1,23 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// 許可するIPアドレスのリスト
 const ALLOWED_IPS = process.env.ALLOWED_IPS?.split(',').map(ip => ip.trim()) || [];
 
 export function middleware(req: NextRequest) {
-  // リクエスト元のIPアドレスを取得
-  const xForwardedFor = req.headers.get('x-forwarded-for');
-  const ip = xForwardedFor?.split(',')[0]?.trim(); // 複数のIPがカンマ区切りで送られる場合の処理
+  const xForwardedFor = req.headers.get('x-forwarded-for'); // プロキシ環境用
+  const ip = xForwardedFor?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || '127.0.0.1';
 
-  // IPアドレスが許可リストにない場合、403を返す
+  console.log('Request IP:', ip);
+  console.log('Allowed IPs:', ALLOWED_IPS);
+
   if (!ip || !ALLOWED_IPS.includes(ip)) {
+    console.log('Access denied for IP:', ip);
     return new NextResponse('Access denied: Unauthorized IP', { status: 403 });
   }
 
-  // 許可された場合は次の処理へ
+  console.log('Access granted for IP:', ip);
   return NextResponse.next();
 }
 
-// ミドルウェアを適用するルートを指定
 export const config = {
-  matcher: '/blog/new', // 投稿画面のルートのみ制限
+  matcher: '/blog/new',
 };
