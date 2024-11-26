@@ -7,7 +7,8 @@ interface BlogProps {
 }
 
 export default async function BlogSingle({ params }: BlogProps) {
-  const docRef = doc(db, "blogPosts", params.slug); // `slug`をFirestoreのIDとして利用
+  const { slug } = await Promise.resolve(params);
+  const docRef = doc(db, "blogPosts", slug); // `slug`をFirestoreのIDとして利用
   const snapshot = await getDoc(docRef);
 
   if (!snapshot.exists()) {

@@ -1,13 +1,23 @@
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './config';
 
+export type BlogPost = {
+  id: string;
+  title: string;
+  content: string;
+};
+
 // ブログ記事を取得する関数
-export async function fetchBlogPosts() {
+export async function fetchBlogPosts(): Promise<BlogPost[]> {
   const postsCollection = collection(db, 'blogPosts');
   const snapshot = await getDocs(postsCollection);
 
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+  return snapshot.docs.map((doc) => {
+    const data = doc.data() as { title: string; content: string }; // 必須フィールドに型を適用
+    return {
+      id: doc.id, // 既にFirestoreで取得したID
+      title: data.title,
+      content: data.content,
+    };
+  });
 }
