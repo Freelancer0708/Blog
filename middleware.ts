@@ -1,23 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// マッチさせるルートを指定
-export const config = {
-  matcher: ['/blog/new'], // ベーシック認証を適用するルート
-};
+const USERNAME = process.env.BASIC_ID || 'admin';
+const PASSWORD = process.env.BASIC_PWD || 'password';
 
 export function middleware(req: NextRequest) {
-  const isLocalDevelopment = process.env.NODE_ENV === 'development';
+  const authHeader = req.headers.get('authorization');
+  console.log('Authorization Header:', authHeader); // デバッグ用ログ
 
-  // 開発環境または認証情報が設定されていない場合は認証をスキップ
-  if (isLocalDevelopment || !process.env.BASIC_ID || !process.env.BASIC_PWD) {
-    return NextResponse.next();
-  }
-
-  const basicAuth = req.headers.get('authorization');
-
-  // 認証ヘッダーがない場合は401を返す
-  if (!basicAuth) {
-    return new Response('Authentication required', {
+  if (!authHeader) {
+    return new NextResponse('Unauthorized', {
       status: 401,
       headers: {
         'WWW-Authenticate': 'Basic realm="Secure Area"',
@@ -25,24 +16,26 @@ export function middleware(req: NextRequest) {
     });
   }
 
-  try {
-    // ヘッダーから認証情報をデコード
-    const authValue = basicAuth.split(' ')[1];
-    const [user, pwd] = atob(authValue).split(':');
+  const [scheme, encoded] = authHeader.split(' ');
 
-    // ユーザー名とパスワードを検証
-    if (user === process.env.BASIC_ID && pwd === process.env.BASIC_PWD) {
-      return NextResponse.next(); // 認証成功
-    }
-  } catch (e) {
-    return new Response('Invalid Authentication', { status: 400 });
+  if (scheme !== 'Basic' || !encoded) {
+    return new NextResponse('Unauthorized', {
+      status: 401,
+      headers: {
+        'WWW-Authenticate': 'Basic realm="Secure Area"',
+      },
+    });
   }
 
-  // 認証失敗時
-  return new Response('Unauthorized', {
-    status: 401,
-    headers: {
-      'WWW-Authenticate': 'Basic realm="Secure Area"',
-    },
-  });
+  const [username, password] = atob(encoded).split(':');
+
+  if (username !== USERNAME || password !== PASSWORD) {
+    return new NextResponse('Forbidden', { status: 403 });
+  }
+
+  return NextResponse.next();
 }
+
+export const config = {
+  matcher: '/blog/new', // ベーシック認証を適用するルート
+};
