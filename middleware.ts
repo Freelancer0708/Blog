@@ -5,15 +5,16 @@ import type { NextRequest } from 'next/server';
 const ALLOWED_IPS = (process.env.ALLOWED_IPS || '').split(',');
 
 export function middleware(req: NextRequest) {
-  // リクエスト元のIPを取得
-  const ip = req.ip || req.headers.get('x-forwarded-for')?.split(',')[0];
+  // リクエスト元のIPアドレスを取得
+  const forwardedFor = req.headers.get('x-forwarded-for') || '';
+  const ip = forwardedFor.split(',')[0].trim(); // カンマ区切りの最初のIPを取得
 
-  // 許可IPリストにない場合は403エラーページを返す
-  if (!ALLOWED_IPS.includes(ip || '')) {
+  // IPが許可されているかチェック
+  if (!ALLOWED_IPS.includes(ip)) {
     return new NextResponse('Access Denied', { status: 403 });
   }
 
-  // 許可されている場合は次の処理に進む
+  // 許可されている場合は次の処理へ
   return NextResponse.next();
 }
 
