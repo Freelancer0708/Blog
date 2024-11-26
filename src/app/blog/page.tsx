@@ -11,7 +11,7 @@ export default async function Blog() {
           <h1>Blog Page</h1>
 
           <section className={styles.list}>
-            {posts.map((post:any) => (
+            {posts.map((post) => (
               <Link href={`/blog/${post.id}`} key={post.id} className={styles.item}>
                 <h2>{post.title}</h2>
                 <p>{post.content.length > 60 ? `${post.content.slice(0, 60)}...` : post.content}</p>

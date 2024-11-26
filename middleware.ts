@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // 許可するIPアドレスのリスト
-const ALLOWED_IPS = ['203.0.113.1', '127.0.0.1', '::1'];
+const ALLOWED_IPS = process.env.ALLOWED_IPS?.split(',').map(ip => ip.trim()) || [];
 
 export function middleware(req: NextRequest) {
   // リクエスト元のIPアドレスを取得
