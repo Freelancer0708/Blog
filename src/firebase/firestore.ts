@@ -16,8 +16,8 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
     const data = doc.data() as { title: string; content: string }; // 必須フィールドに型を適用
     return {
       id: doc.id, // 既にFirestoreで取得したID
-      title: data.title,
-      content: data.content,
+      title: data.title || 'Untitled',
+      content: data.content || 'No content available',
     };
   });
 }
