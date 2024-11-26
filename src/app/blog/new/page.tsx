@@ -1,17 +1,30 @@
 "use client";
 import styles from "./blognew.module.css";
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import { useAuth } from '../../../context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function NewBlogPost() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPublished, setIsPublished] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading01, setLoading01] = useState(false);
+
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading) return <p>Loading...</p>;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setLoading(true); // ローディング開始
+    setLoading01(true); // ローディング開始
 
     try {
       const response = await fetch("/api/blog", {
@@ -35,7 +48,7 @@ export default function NewBlogPost() {
       console.error("Unexpected error:", error);
       alert("An unexpected error occurred. Please try again.");
     } finally {
-      setLoading(false); // ローディング終了
+        setLoading01(false); // ローディング終了
     }
   };
 
@@ -52,7 +65,7 @@ export default function NewBlogPost() {
               onChange={(e) => setTitle(e.target.value)}
               className={styles.input}
               required
-              disabled={loading} // ローディング中は無効化
+              disabled={loading01} // ローディング中は無効化
             />
           </div>
           <div className={styles.item}>
@@ -62,7 +75,7 @@ export default function NewBlogPost() {
               onChange={(e) => setContent(e.target.value)}
               className={styles.textarea}
               required
-              disabled={loading} // ローディング中は無効化
+              disabled={loading01} // ローディング中は無効化
             ></textarea>
           </div>
           <div className={styles.item}>
@@ -71,7 +84,7 @@ export default function NewBlogPost() {
                 type="checkbox"
                 checked={isPublished}
                 onChange={(e) => setIsPublished(e.target.checked)}
-                disabled={loading} // ローディング中は無効化
+                disabled={loading01} // ローディング中は無効化
               />
               Published
             </label>
@@ -79,9 +92,9 @@ export default function NewBlogPost() {
           <button
             type="submit"
             className={styles.submit}
-            disabled={loading} // ローディング中は無効化
+            disabled={loading01} // ローディング中は無効化
           >
-            {loading ? "Submitting..." : "Submit"}
+            {loading01 ? "Submitting..." : "Submit"}
           </button>
         </form>
       </main>
