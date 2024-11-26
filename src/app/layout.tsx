@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Link from "next/link";
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,7 +32,7 @@ export default function RootLayout({
           <Link href="/">Home</Link>
           <Link href="/blog">Blog</Link>
         </header>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
