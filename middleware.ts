@@ -1,23 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-const ALLOWED_IPS = process.env.ALLOWED_IPS?.split(',').map(ip => ip.trim()) || [];
+// 環境変数から許可されているIPアドレスを取得
+const ALLOWED_IPS = (process.env.ALLOWED_IPS || '').split(',');
 
 export function middleware(req: NextRequest) {
-  const xForwardedFor = req.headers.get('x-forwarded-for'); // プロキシ環境用
-  const ip = xForwardedFor?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || '127.0.0.1';
+  // リクエスト元のIPアドレスを取得
+  const forwardedFor = req.headers.get('x-forwarded-for') || '';
+  const ip = forwardedFor.split(',')[0].trim(); // カンマ区切りの最初のIPを取得
 
-  console.log('Request IP:', ip);
-  console.log('Allowed IPs:', ALLOWED_IPS);
-
-  if (!ip || !ALLOWED_IPS.includes(ip)) {
-    console.log('Access denied for IP:', ip);
-    return new NextResponse('Access denied: Unauthorized IP', { status: 403 });
+  // IPが許可されているかチェック
+  if (!ALLOWED_IPS.includes(ip)) {
+    return new NextResponse('Access Denied', { status: 403 });
   }
 
-  console.log('Access granted for IP:', ip);
+  // 許可されている場合は次の処理へ
   return NextResponse.next();
 }
 
+// このmiddlewareを特定のルートに適用
 export const config = {
-  matcher: '/blog/new',
+  matcher: '/blog/new', // /blog/newのみに適用
 };
