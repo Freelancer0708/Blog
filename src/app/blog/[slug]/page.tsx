@@ -3,11 +3,11 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 
 interface BlogProps {
-  params: { slug: string }; // URLの`slug`パラメータ
+  params: Promise<{ slug: string }>; // `params`をPromiseとして型定義
 }
 
 export default async function BlogSingle({ params }: BlogProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const docRef = doc(db, "blogPosts", slug); // `slug`をFirestoreのIDとして利用
   const snapshot = await getDoc(docRef);
 
