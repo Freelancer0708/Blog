@@ -45,11 +45,6 @@
 }
 
 @media (max-width: 600px) {
-  .login {
-    padding: 32px;
-    padding-bottom: 80px;
-  }
-
   .main {
     align-items: center;
   }
