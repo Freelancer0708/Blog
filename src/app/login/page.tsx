@@ -32,20 +32,22 @@ export default function LoginPage() {
     <div className={styles.login}>
       <main className={styles.main}>
         <h1>Login</h1>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} className={styles.form}>
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className={styles.input}
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className={styles.input}
           />
-          <button type="submit">Login</button>
+          <button type="submit" className={styles.submit}>Login</button>
         </form>
         {error && <p style={{ color: "red" }}>{error}</p>}
       </main>
