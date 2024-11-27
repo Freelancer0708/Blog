@@ -5,6 +5,7 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth } from "../../firebase/config";
+import { FirebaseError } from "firebase/app";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,8 +19,12 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/blog/new");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        setError(err.message); // FirebaseError型として処理
+      } else {
+        setError("An unknown error occurred");
+      }
     }
   };
 
